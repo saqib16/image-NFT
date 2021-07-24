@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="style.css" />
+    <title>NFTs</title>
+    <script language="javascript" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="web3.min.js"></script>
+    <script language="javascript" type="text/javascript" src="contractJSON.js"></script> 
+    <script src="https://unpkg.com/ipfs-api@9.0.0/dist/index.js"
+    integrity="sha384-5bXRcW9kyxxnSMbOoHzraqa7Z0PQWIao+cgeg327zit1hz5LZCEbIMx/LWKPReuB"
+    crossorigin="anonymous"></script>
+    <script src="https://bundle.run/buffer@6.0.3"></script>
+  </head>
+
+  <body>
+    <div class="navbar">
+      <a href="home.html">Home</a>
+      <a href="createNFT.html">Create NFT</a>
+      <a href="#transfer">Transfer NFT</a>
+
+    </div>
+    
+<h1>Create NFT</h1>
+
+
+<button class="enableEthereumButton">Enable Ethereum</button>
+<div style="color: white;" id="txStatus"></div>
+<div class="container">
+
+  <form id="form">
+    <div class="form-control">
+      <label for="text">Name</label>
+      <input type="text" id="text" placeholder="Enter text..." />
+      <br/>
+    </div>
+
+    <div class="form-control">
+      <label for="amount">Price</label>
+      <input type="number" id="amount" placeholder="Enter amount..." />
+      <br/>
+    </div>
+    <div class="form-control">
+      <label for="Desc">Description</label>
+      <input type="text" id="Desc" placeholder="Enter description..." />
+      <br/>
+    </div>
+    <div class="form-control">
+      <label for="nftImg">Image</label>
+      <input type='file' id="nftImg" />
+    </div>
+
+   
+    <button class="btn">Add</button>
+    <button class="btnCancel">Cancel</button>
+  </form>
+</div>
+
+
+<script src="script.js"></script>
+    
+    </body>
+    </html>
