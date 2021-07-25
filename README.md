@@ -1,1 +1,1 @@
-# image-NFT
+# Images display using IPFS over blockchain
