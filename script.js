@@ -1,30 +1,37 @@
 // const balance = document.getElementById('balance');
 // const money_plus = document.getElementById('money-plus');
 // const money_minus = document.getElementById('money-minus');
-// const list = document.getElementById('list');
+
+
+var visitingPage = location.pathname.substring(location.pathname.lastIndexOf("/") + 1);
+const list = document.getElementById('list');
 const form = document.getElementById('form');
 const text = document.getElementById('text');
 const amount = document.getElementById('amount');
 const nftImg = document.getElementById('nftImg');
 const Desc = document.getElementById('Desc');
-const ipfs = window.IpfsApi('ipfs.infura.io', '5001');
+const ipfs = window.IpfsApi({host:'ipfs.infura.io',port: 5001, protocol: "https"});
+
+
 
 let listtransactions = [];
-
-// Add transaction
+var transaction ;
+// Add transaction for NFT
 function addTransaction(e) {
   e.preventDefault();
-
-  // var eleCheck = document.getElementsByName('record_trans');
-  // var selectedIndex = -1 ;           
-  // for(i = 0; i < eleCheck.length; i++) {
-  //     if(eleCheck[i].checked)
-  //         selectedIndex = i;
-  // }
 
   if (text.value.trim() === '' || amount.value.trim() === '' || nftImg.files.length <= 0 ) {
     alert('Please enter name and price and select image .');
   } else {
+
+    let desc = Desc.value != "" ? Desc.value : "" ;
+    transaction = {
+      name: text.value,
+      price: +amount.value,
+      desc: desc
+    };
+
+
 
     let nftHash = getNFTHash();
     if(nftHash == 0)
@@ -32,12 +39,7 @@ function addTransaction(e) {
       alert("Something went wrong while saving image. Please try again.");
       return;
     }
-    let desc = Desc.value != "" ? Desc.value : "" ;
-    const transaction = {
-      name: text.value,
-      price: +amount.value,
-      desc: desc
-    };
+    
 
     // recordTransaction(transaction.name, transaction.price, transaction.hash, transaction.desc);
 
@@ -48,47 +50,58 @@ function addTransaction(e) {
   }
 }
 
+function transferTransaction(e) {
+  e.preventDefault();
+
+  let nftID = document.getElementById('nftID');
+  let transferToAddress = document.getElementById('transferToAddress');
+
+  if (nftID.value.trim() === '' || transferToAddress.value.trim() === '' ) {
+    alert('Please enter id and adress to transfer .');
+  } else {
+
+
+    $("#txStatus").text("Creating new transaction on the blockchain. This may take a while...");
+
+    return expIncomeContract.methods.transferFrom(userAccount, transferToAddress.value.trim(), nftID.value.trim())
+      .send({ from: userAccount, gas : 1000000 })
+      .on("receipt", function (receipt) {
+        $("#txStatus").text("Successfully tranferred " + nftID.value.trim() + " !");
+
+      })
+      .on("error", function (error) {
+
+        $("#txStatus").text(error);
+      });
+  
+  }
+}
+
 // Add transactions to DOM list
-function addTransactionDOM(_transaction) {
+function addTransactionDOM(_transaction,_id) {
   // Get sign
   listtransactions.push(_transaction);
-  const sign = _transaction.tranType == "exp" ? '-' : '+';
+  //const sign = _transaction.tranType == "exp" ? '-' : '+';
 
   const item = document.createElement('li');
 
   // Add class based on value
-  item.classList.add(_transaction.tranType == "exp" ? 'minus' : 'plus');
+  item.classList.add('img1');
+  //item.Id = _id;
 
-  item.innerHTML = `
-    ${_transaction.desc} <span>${sign}${Math.abs(
-      _transaction.amount
-  )}</span>
-  `;
+  item.innerHTML = `<figure>
+  <img src="https://ipfs.io/ipfs/${_transaction.ipfsHash}" alt="${_transaction.name}" width="300" height="250">
+  <figcaption> ${_transaction.name}</figcaption>
+  <figcaption>$<span>${_transaction.price}</span></figcaption>
+</figure>
+`;
+
 
   list.appendChild(item);
 }
 
-// Update the balance, income and expense
-function updateValues() {
-
-    const income = listtransactions
-    .filter(item => item.tranType == "inc")
-    .reduce((acci, item) => (acci += parseInt(item.amount)), 0);
-    //.toFixed(2);
-
-    const expense = listtransactions
-    .filter(item => item.tranType == "exp")
-    .reduce((acc, item) => (acc += parseInt(item.amount)), 0);
-    //.toFixed(2);
-
-  balance.innerText = `$${Math.abs(income-expense)}`;
-  money_plus.innerText = `$${Math.abs(income)}`;
-  money_minus.innerText = `$${Math.abs(expense)}`;
-}
-
-
 function getNFTHash() {
-  inputElement = nftImg;
+  let inputElement = nftImg;
 
   var file = inputElement.files[0];
   var reader = new FileReader();
@@ -104,7 +117,7 @@ function getNFTHash() {
       const buf = buffer.Buffer(reader.result)
       ipfs.files.add(buf, (error, result) => {
         if(error) {
-          console.error(error)
+          console.log(error)
           return 0;
         }
     
@@ -139,19 +152,19 @@ function getNFTHash() {
       expIncomeContract = new web3js.eth.Contract(
         MyContract.abi,
         deployedNetwork.address
-      );
+      );*/
 
-      const address_eth_cli = "0x2a2244E77C127789058FeEd4809C2Fa97810cB37";
-      const addresses = await web3js.eth.getAccounts();
-      userAccount = address_eth_cli;//addresses[2];*/
+      const address_eth_cli = "0xf3c7230F2B6989b9afDd21431CD26C7fe6bD88FF";
+      //const addresses = await web3js.eth.getAccounts();
+      userAccount = address_eth_cli;//addresses[2];
 
 
       
       // var contAddress = "0xDCeA0EB6c5D1Bfe22fdF20DCE791a7fF154cA753";
       // expIncomeContract = new web3js.eth.contract(MyContract.abi, contAddress);
 
-      //var contAddress = "0xDCeA0EB6c5D1Bfe22fdF20DCE791a7fF154cA753";
-      expIncomeContract = new web3js.eth.contract(MyContract.abi);
+      var contAddress = "0x326e371BFFceBccd96F104824056993670F15eC4";
+      expIncomeContract = new web3js.eth.Contract(MyContract.abi, contAddress);
 
 
       // var accountInterval = setInterval(function() {
@@ -184,6 +197,10 @@ function getNFTHash() {
       //     let data = event.returnValues;
       //     getTransactionByOwner(userAccount).then(displayTransactions);
       //   }).on("error", console.error);
+
+
+      if(visitingPage == "home.html")
+        getTransactionByOwner(userAccount).then(displayTransactions);
     }
 
     function displayTransactions(ids) {
@@ -191,13 +208,14 @@ function getNFTHash() {
       for (id of ids) {
 
         getTransactionDetails(id)
-          .then(function (tran) {
+          .then(function (tran,id) {
 
 
-            addTransactionDOM(tran);
-            updateValues();
+            addTransactionDOM(tran,id);
+           // updateValues();
           });
-            
+
+
       }
 
     }
@@ -212,7 +230,6 @@ function getNFTHash() {
         .on("receipt", function (receipt) {
           $("#txStatus").text("Successfully created " + _name + "!");
 
-          //getTransactionByOwner(userAccount).then(displayTransactions);
         })
         .on("error", function (error) {
 
@@ -221,7 +238,7 @@ function getNFTHash() {
     }
 
     function getTransactionDetails(id) {
-      return expIncomeContract.methods.listTransactions(id).call()
+      return expIncomeContract.methods.listnftsImgs(id).call()
     }
 
 
@@ -255,10 +272,16 @@ function getNFTHash() {
       // Set Account
       web3js.eth.defaultAccount = web3js.eth.accounts[0];
 
-      
+ 
     init();
 
     })
 
+if(visitingPage == "createNFT.html")
+  form.addEventListener('submit', addTransaction);
 
-form.addEventListener('submit', addTransaction);
+if(visitingPage == "transferNFT.html")
+{
+  document.getElementById('formTransfer').addEventListener('submit', transferTransaction);
+}
+

@@ -21,39 +21,30 @@
 
     <div class="navbar">
       <a href="home.html">Home</a>
-      <a href="createNFT.html">Create NFT</a>
 
     </div>
     
-<h1>Create NFT</h1>
+<h1>Transfer NFT</h1>
 
 <div style="color: white;" id="txStatus"></div>
 <div class="container">
 
-  <form id="form">
+  <form id="formTransfer">
     <div class="form-control">
-      <label for="text">Name</label>
-      <input type="text" id="text" placeholder="Enter text..." />
+      <label for="text">Id</label>
+      <input type="text" id="nftID" placeholder="Enter text..." />
       <br/>
     </div>
 
     <div class="form-control">
-      <label for="amount">Price</label>
-      <input type="number" id="amount" placeholder="Enter amount..." />
+      <label for="transferToAddress">Buyer Address</label>
+      <input type="text" id="transferToAddress" placeholder="Enter description..." />
       <br/>
     </div>
-    <div class="form-control">
-      <label for="Desc">Description</label>
-      <input type="text" id="Desc" placeholder="Enter description..." />
-      <br/>
-    </div>
-    <div class="form-control">
-      <label for="nftImg">Image</label>
-      <input type='file' id="nftImg" />
-    </div>
+
 
    
-    <button class="btn">Add</button>
+    <button class="btn">Transfer</button>
     <!-- <button class="btnCancel">Cancel</button> -->
   </form>
 </div>
