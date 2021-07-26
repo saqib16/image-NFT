@@ -93,6 +93,7 @@ function addTransactionDOM(_transaction,_id) {
   <img src="https://ipfs.io/ipfs/${_transaction.ipfsHash}" alt="${_transaction.name}" width="300" height="250">
   <figcaption> ${_transaction.name}</figcaption>
   <figcaption>$<span>${_transaction.price}</span></figcaption>
+  <figcaption>ID: <span>${_id}</span></figcaption>
 </figure>
 `;
 
@@ -199,11 +200,11 @@ function getNFTHash() {
       //   }).on("error", console.error);
 
 
-      if(visitingPage == "home.html")
+      if(visitingPage == "index.html")
         getTransactionByOwner(userAccount).then(displayTransactions);
     }
 
-    function displayTransactions(ids) {
+    function displayTransactions11(ids) {
       list.innerHTML = '';
       for (id of ids) {
 
@@ -216,6 +217,19 @@ function getNFTHash() {
           });
 
 
+      }
+
+    }
+
+    async function displayTransactions(ids) {
+      list.innerHTML = '';
+      for (id of ids) {
+
+       let tran = await getTransactionDetails(id);
+
+        addTransactionDOM(tran,id);
+
+         
       }
 
     }
@@ -248,7 +262,7 @@ function getNFTHash() {
 
 
 
-    window.addEventListener('load', function () {
+    window.addEventListener('load', async()=> {
 
 
       // if (typeof Web3 !== 'undefined') {
@@ -263,24 +277,102 @@ function getNFTHash() {
       // }
 
       // Initialize Web3
-      if (typeof web3js !== 'undefined') {
-        web3js = new Web3(web3js.currentProvider);
-      } else {
-        web3js = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
-      }
+    //   if (typeof web3js !== 'undefined') {
+    //     web3js = new Web3(web3js.currentProvider);
+    //   } else {
+    //     web3js = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+    //   }
 
-      // Set Account
-      web3js.eth.defaultAccount = web3js.eth.accounts[0];
+    //   // Set Account
+    //   web3js.eth.defaultAccount = web3js.eth.accounts[0];
 
  
-    init();
+    // init();
+
+    let accounts;
+    try {
+      let web3;
+      if (window.ethereum) {
+              web3 = new Web3(window.ethereum);
+              try {
+                // Request account access if needed
+                //await window.ethereum.enable();
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+                //await window.ethereum.send('eth_requestAccounts');
+                window.ethereum.on('accountsChanged', function (_accounts) {
+                  if (_accounts[0] !== userAccount) {
+                        userAccount = _accounts[0];
+          
+                        if(visitingPage == "index.html")
+                        getTransactionByOwner(userAccount).then(displayTransactions);
+                      }
+            
+                });
+               
+              } catch (error) {
+                console.log(error);
+              }
+            }
+            // Legacy dapp browsers...
+            else if (window.web3) {
+              // Use Mist/MetaMask's provider.
+              web3 = new Web3(window.web3.currentProvider);
+              console.log("Injected web3 detected.");
+            }
+            // Fallback to localhost; use dev console port by default...
+           else {
+               web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+             }
+           
+           accounts = await web3.eth.getAccounts();
+           userAccount = accounts[0];
+           //console.log(userAccount);
+            // Get the contract instance.
+            const networkId = await web3.eth.net.getId();
+            const deployedNetwork = MyContract.networks[networkId];
+            // const instance = new web3.eth.Contract(
+            //   SimpleStorageContract.abi,
+            //   deployedNetwork && deployedNetwork.address,
+            // );
+          expIncomeContract = new web3.eth.Contract(MyContract.abi, 
+             deployedNetwork && deployedNetwork.address,
+             );
+
+          } catch (error) {
+            // Catch any errors for any of the above operations.
+            alert(
+              `Failed to load web3, accounts, or contract. Check console for details.`,
+            );
+            console.error(error);
+          }
+
+       
+
+          if(visitingPage == "index.html")
+              getTransactionByOwner(userAccount).then(displayTransactions);
+   
+          // var accountInterval = setInterval(function () {
+
+          //   if (accounts[0] !== userAccount) {
+          //     userAccount = accounts[0];
+
+          //     if(visitingPage == "index.html")
+          //     getTransactionByOwner(userAccount).then(displayTransactions);
+          //   }
+          //   else
+          //   getTransactionByOwner(userAccount).then(displayTransactions);
+
+          // }, 1000);
+
+
+
 
     })
 
-if(visitingPage == "createNFT.html")
+if(visitingPage.toLowerCase().includes("createnft"))
   form.addEventListener('submit', addTransaction);
 
-if(visitingPage == "transferNFT.html")
+if(visitingPage.toLowerCase().includes("transfernft"))
 {
   document.getElementById('formTransfer').addEventListener('submit', transferTransaction);
 }
